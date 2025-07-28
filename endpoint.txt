@@ -1,0 +1,155 @@
+**Meal Voucher API - Endpoint Plan**
+
+---
+
+### 📅 Authentication
+
+**POST /auth/register/staff**  → Register new staff (admin only)
+
+**POST /auth/register/vendor**  → Register new vendor (admin only)
+
+**POST /auth/login**  → Login endpoint (shared by staff and vendors)
+
+**GET /auth/me**  → Get logged-in user profile
+**POST /auth/bulk-register -> bulk register users from an excel file or csv
+
+---
+
+### 👥 Staff
+
+**GET /staff**  → Get all staff (admin only)
+
+**GET /staff/\:id**  → Get staff by ID
+
+**PATCH /staff/\:id**  → Update staff info
+
+**DELETE /staff/\:id**  → Deactivate staff
+
+---
+
+### 🏩 Vendors
+
+**GET /vendors**  → List all vendors
+
+**GET /vendors/\:id**  → Get vendor profile
+
+**PATCH /vendors/\:id**  → Update vendor info
+
+**DELETE /vendors/\:id**  → Remove vendor
+
+---
+
+### 🍲 Vouchers
+
+**GET /vouchers**  → Get vouchers (staff only, filter by week, status)
+
+**POST /vouchers/buy**  → Purchase available voucher(s)
+
+**POST /vouchers/gift**  → Gift a voucher (bought or unbought)
+
+**GET /vouchers/history**  → Get full voucher history
+
+**GET /vouchers/available**  → Get available (unbought) vouchers
+
+---
+
+### 🏆 Orders
+
+**POST /orders**  → Create order using vouchers (returns code like MB-XYZ)
+
+**GET /orders/\:id**  → Get order details
+
+**GET /orders/history**  → View past orders by user
+
+---
+
+### 🔹 Redeem
+
+**POST /redeem**  → Vendor redeems order (code input)
+
+**GET /redeem/logs**  → Vendor views redeemed history
+
+---
+
+### 🎁 Visitor Vouchers
+
+**POST /visitor-vouchers**  → HR creates special voucher for a visitor
+
+**GET /visitor-vouchers/\:code**  → Vendor verifies visitor voucher
+
+**POST /visitor-vouchers/redeem**  → Vendor redeems visitor voucher
+
+---
+
+### 🌟 Admin Tools
+
+**POST /admin/vouchers/allocate**  → Run cron manually to allocate vouchers
+
+**POST /admin/vouchers/deallocate**  → Run cron to remove unused vouchers
+
+**POST /admin/holidays**  → Set public holidays
+
+**GET /admin/reports/weekly**  → Weekly report summary
+
+**GET /admin/reports/vendor/\:id**  → Vendor-wise report
+
+---
+
+### ⚙️ Settings / Meta
+
+**GET /ticket-types**  → Get available ticket types
+
+**GET /roles**  → View roles
+
+**GET /week-cycles**  → View all weeks
+
+**GET /transactions**  → View all transactions (admin only)
+
+
+ Wallet & Transactions
+
+GET    /wallet                        → View wallet balance
+
+POST   /wallet/fund                  → Initiate wallet funding (Paystack)
+
+POST   /paystack/webhook             → Handle Paystack payment callback
+
+GET    /transactions                 → Staff: List wallet transactions
+
+GET    /payments                     → Admin: List all external payments
+
+
+ Gifting & Visitor Vouchers
+
+POST   /vouchers/gift                → Gift owned or allocated voucher to another staff
+
+POST   /visitor/voucher              → Admin issues special voucher to a visitor
+
+GET    /visitor/vouchers             → Admin view all visitor vouchers issued
+
+📅 Weekly Cron Jobs (Internal Only)
+
+CRON   allocate-weekly-vouchers      → Every Monday 7AM
+
+CRON   deallocate-unused-vouchers    → Every Sunday 11:59PM
+
+CRON   generate-weekly-report        → Optional weekly summary per staff/vendor
+
+📆 Holidays
+
+POST   /holidays                     → Admin adds a public holiday
+
+GET    /holidays                     → View upcoming holidays
+
+⚙️ Admin Tools
+
+GET    /admin/dashboard              → Metrics overview
+
+GET    /admin/activity-log           → System audit 
+
+### ⚠️ Notes:
+
+* Auth uses shared login `/auth/login`, but after login, user type is determined from DB.
+* Use middleware to protect routes based on roles (e.g., HR, vendor, staff).
+* Use enums for ticket type, voucher status, and transaction types.
+* `MB-XXXXXX` codes are generated when creating an order or issuing visitor vouchers.
